@@ -341,6 +341,7 @@ project('pxf-json') {
       compile(project(':pxf-hdfs'))
       compile(project(':pxf-service'))
       compile "org.apache.commons:commons-lang3:3.0"
+	  compile "com.jayway.jsonpath:json-path:2.1.0"
 
       testCompile 'pl.pragmatists:JUnitParams:1.0.2'
     }

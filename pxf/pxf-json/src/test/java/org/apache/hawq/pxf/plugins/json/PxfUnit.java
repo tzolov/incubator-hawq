@@ -21,7 +21,6 @@ package org.apache.hawq.pxf.plugins.json;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
@@ -52,8 +51,6 @@ import org.apache.hawq.pxf.service.FragmentsResponseFormatter;
 import org.apache.hawq.pxf.service.utilities.ProtocolData;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 
