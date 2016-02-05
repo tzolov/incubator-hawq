@@ -19,7 +19,6 @@ package org.apache.hawq.pxf.plugins.json;
  * under the License.
  */
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -30,7 +29,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hawq.pxf.api.OneField;
 import org.apache.hawq.pxf.api.OneRow;
 import org.apache.hawq.pxf.api.ReadResolver;
-import org.apache.hawq.pxf.api.io.DataType;
 import org.apache.hawq.pxf.api.utilities.ColumnDescriptor;
 import org.apache.hawq.pxf.api.utilities.InputData;
 import org.apache.hawq.pxf.api.utilities.Plugin;
@@ -50,6 +48,8 @@ import com.jayway.jsonpath.spi.mapper.MappingProvider;
  * and JSON array indexing.
  */
 public class JsonResolverJsonPathExpression extends Plugin implements ReadResolver {
+
+	private static final String EXPRESSION_PREFIX = "$.";
 
 	private static final Log LOG = LogFactory.getLog(JsonResolverJsonPathExpression.class);
 
@@ -88,13 +88,13 @@ public class JsonResolverJsonPathExpression extends Plugin implements ReadResolv
 
 		String jsonRecordAsText = row.getData().toString();
 
-		DocumentContext jsonDocument =  null; 
+		DocumentContext jsonDocument = null;
 		try {
 			jsonDocument = JsonPath.using(jsonPathConfig).parse(jsonRecordAsText);
 		} catch (Exception e) {
 			LOG.debug(e);
 		}
-		
+
 		if (jsonDocument == null) {
 			LOG.warn("Return empty-fields row due to invalid JSON: " + jsonRecordAsText);
 			return emptyRow;
@@ -103,15 +103,18 @@ public class JsonResolverJsonPathExpression extends Plugin implements ReadResolv
 		// Iterate through the column definition and fetch our JSON data
 		for (ColumnDescriptorCache columnMetadata : columnDescriptorCache) {
 
-			Object value = JsonPath.using(jsonPathConfig).parse(jsonRecordAsText)
-					.read("$." + columnMetadata.getColumnName());
+			Object value = null;
 
-			// If this node is null or missing, add a null value here
-			if (value == null) {
-				addNullField(columnMetadata.getColumnType());
-			} else {
-				addFieldFromJsonNode(columnMetadata.getColumnType(), value);
+			try {
+				value = JsonPath.using(jsonPathConfig).parse(jsonRecordAsText)
+						.read(EXPRESSION_PREFIX + columnMetadata.getColumnName(), columnMetadata.getMappingClass());
+			} catch (Exception e) {
+				LOG.error(
+						"Empty field because of unresolve expression: " + EXPRESSION_PREFIX
+								+ columnMetadata.getColumnName(), e);
 			}
+
+			oneFieldList.add(new OneField(columnMetadata.getColumnType().getOID(), value));
 		}
 
 		return oneFieldList;
@@ -128,89 +131,26 @@ public class JsonResolverJsonPathExpression extends Plugin implements ReadResolv
 		return emptyFieldList;
 	}
 
-
-
-	/**
-	 * Adds a field from a given JSON node value based on the {@link DataType} type.
-	 * 
-	 * @param type
-	 *            The DataType type
-	 * @param val
-	 *            The JSON node to extract the value.
-	 * @throws IOException
-	 */
-	private void addFieldFromJsonNode(DataType type, Object val) throws IOException {
-		OneField oneField = new OneField();
-		oneField.type = type.getOID();
-
-		if (val == null) {
-			oneField.val = null;
-		} else {
-			oneField.val = val;
-//			switch (type) {
-//			case BIGINT:
-//				oneField.val = new Long((Integer) val);
-//				break;
-//			case BOOLEAN:
-//				oneField.val = Boolean.valueOf((String)val);
-//				break;
-//			case CHAR:
-//				oneField.val = ((String)val).charAt(0);
-//				break;
-//			case BYTEA:
-//				oneField.val = ((String)val).getBytes();
-//				break;
-//			case FLOAT8:
-//			case REAL:
-//				oneField.val = (Double) val;
-//				break;
-//			case INTEGER:
-//			case SMALLINT:
-//				oneField.val = (Integer) val;
-//				break;
-//			case BPCHAR:
-//			case TEXT:
-//			case VARCHAR:
-//				oneField.val = val;
-//				break;
-//			default:
-//				throw new IOException("Unsupported type " + type);
-//			}
-		}
-
-		oneFieldList.add(oneField);
-	}
-
-	/**
-	 * Adds a null field of the given type.
-	 * 
-	 * @param type
-	 *            The {@link DataType} type
-	 */
-	private void addNullField(DataType type) {
-		oneFieldList.add(new OneField(type.getOID(), null));
-	}
-	
 	private void initJsonConf() {
 		Configuration.setDefaults(new Configuration.Defaults() {
 
-		    private final JsonProvider jsonProvider = new JacksonJsonProvider();
-		    private final MappingProvider mappingProvider = new JacksonMappingProvider();
+			private final JsonProvider jsonProvider = new JacksonJsonProvider();
+			private final MappingProvider mappingProvider = new JacksonMappingProvider();
 
-		    @Override
-		    public JsonProvider jsonProvider() {
-		        return jsonProvider;
-		    }
+			@Override
+			public JsonProvider jsonProvider() {
+				return jsonProvider;
+			}
 
-		    @Override
-		    public MappingProvider mappingProvider() {
-		        return mappingProvider;
-		    }
+			@Override
+			public MappingProvider mappingProvider() {
+				return mappingProvider;
+			}
 
-		    @Override
-		    public Set<Option> options() {
-		        return EnumSet.noneOf(Option.class);
-		    }
+			@Override
+			public Set<Option> options() {
+				return EnumSet.noneOf(Option.class);
+			}
 		});
 	}
 }

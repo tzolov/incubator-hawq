@@ -1,6 +1,6 @@
 {
     "bintType" : 666,
-    "booleanType" : "true",
+    "booleanType" : true,
     "charType" : "x",
     "byteaType" : "a",
     "float8Type" : 3.14,

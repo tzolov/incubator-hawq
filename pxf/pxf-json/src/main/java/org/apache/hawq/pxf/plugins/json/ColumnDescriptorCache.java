@@ -40,11 +40,14 @@ public class ColumnDescriptorCache {
 	private final int arrayNodeIndex;
 	private final boolean isArray;
 	private String columnName;
+	private Class<?> mappingClass;
 
 	public ColumnDescriptorCache(ColumnDescriptor columnDescriptor) {
 
 		// HAWQ column type
 		this.columnType = DataType.get(columnDescriptor.columnTypeCode());
+
+		this.mappingClass = getMappingClass(columnType);
 
 		this.columnName = columnDescriptor.columnName();
 
@@ -115,5 +118,45 @@ public class ColumnDescriptorCache {
 	 */
 	public boolean isArray() {
 		return isArray;
+	}
+
+	public Class<?> getMappingClass() {
+		return mappingClass;
+	}
+
+	private Class<?> getMappingClass(DataType type) {
+
+		Class<?> clazz = null;
+
+		switch (type) {
+		case BIGINT:
+			clazz = Long.class;
+			break;
+		case BOOLEAN:
+			clazz = Boolean.class;
+			break;
+		case CHAR:
+			clazz = String.class; // Character.class;
+			break;
+		case BYTEA:
+			// oneField.val = ((String)val).getBytes();
+			break;
+		case FLOAT8:
+		case REAL:
+			clazz = Double.class;
+			break;
+		case INTEGER:
+		case SMALLINT:
+			clazz = Integer.class;
+			break;
+		case BPCHAR:
+		case TEXT:
+		case VARCHAR:
+			clazz = String.class;
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported type " + type);
+		}
+		return clazz;
 	}
 }
