@@ -139,15 +139,19 @@ public class ColumnDescriptorCache {
 			clazz = String.class; // Character.class;
 			break;
 		case BYTEA:
-			// oneField.val = ((String)val).getBytes();
-			break;
+			clazz = Byte[].class;
+			break;			
 		case FLOAT8:
-		case REAL:
 			clazz = Double.class;
 			break;
+		case REAL:
+			clazz = Float.class;
+			break;
 		case INTEGER:
-		case SMALLINT:
 			clazz = Integer.class;
+			break;
+		case SMALLINT:
+			clazz = Short.class;
 			break;
 		case BPCHAR:
 		case TEXT:
