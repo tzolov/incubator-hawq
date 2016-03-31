@@ -31,6 +31,7 @@ import org.apache.hawq.pxf.api.io.DataType;
 import org.apache.hawq.pxf.plugins.hdfs.HdfsDataFragmenter;
 import org.apache.hawq.pxf.plugins.json.JsonAccessor;
 import org.apache.hawq.pxf.plugins.json.JsonResolver;
+import org.apache.hawq.pxf.plugins.json.PxfUnit;
 import org.junit.After;
 import org.junit.Test;
 
