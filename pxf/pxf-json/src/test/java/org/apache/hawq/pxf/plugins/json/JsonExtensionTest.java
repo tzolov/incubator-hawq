@@ -109,19 +109,20 @@ public class JsonExtensionTest extends PxfUnit {
 
 		columnDefs.clear();
 
-		columnDefs.add(new Pair<String, DataType>("text", DataType.TEXT));
+		columnDefs.add(new Pair<String, DataType>("textType", DataType.TEXT));
 		columnDefs.add(new Pair<String, DataType>("varcharType", DataType.VARCHAR));
 		columnDefs.add(new Pair<String, DataType>("bpcharType", DataType.BPCHAR));
 		columnDefs.add(new Pair<String, DataType>("smallintType", DataType.SMALLINT));
 		columnDefs.add(new Pair<String, DataType>("integerType", DataType.INTEGER));
-		columnDefs.add(new Pair<String, DataType>("realType", DataType.REAL));
+        columnDefs.add(new Pair<String, DataType>("realType", DataType.REAL));
 		columnDefs.add(new Pair<String, DataType>("float8Type", DataType.FLOAT8));
 		// The DataType.BYTEA type is left out for further validation.
+		//columnDefs.add(new Pair<String, DataType>("byteaType", DataType.BYTEA));
 		columnDefs.add(new Pair<String, DataType>("charType", DataType.CHAR));
 		columnDefs.add(new Pair<String, DataType>("booleanType", DataType.BOOLEAN));
 		columnDefs.add(new Pair<String, DataType>("bintType", DataType.BIGINT));
 
-		output.add(",varcharType,bpcharType,777,999,3.15,3.14,x,true,666");
+		output.add("textType,varcharType,bpcharType,777,999,3.15,3.14,x,true,666");
 
 		super.assertOutput(new Path(System.getProperty("user.dir") + File.separator
 				+ "src/test/resources/datatypes-test.json"), output);

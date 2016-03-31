@@ -111,7 +111,7 @@ public class JsonResolverJsonPathExpression extends Plugin implements ReadResolv
 			} catch (Exception e) {
 				LOG.error(
 						"Empty field because of unresolve expression: " + EXPRESSION_PREFIX
-								+ columnMetadata.getColumnName(), e);
+								+ columnMetadata.getColumnName() + " json: " + jsonRecordAsText, e);
 			}
 
 			oneFieldList.add(new OneField(columnMetadata.getColumnType().getOID(), value));

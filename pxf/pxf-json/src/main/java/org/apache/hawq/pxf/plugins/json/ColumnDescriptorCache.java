@@ -151,7 +151,7 @@ public class ColumnDescriptorCache {
 			clazz = Integer.class;
 			break;
 		case SMALLINT:
-			clazz = Short.class;
+			clazz = Integer.class; // Should be Short.class (Bug) 
 			break;
 		case BPCHAR:
 		case TEXT:
